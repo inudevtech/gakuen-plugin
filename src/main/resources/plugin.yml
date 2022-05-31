@@ -1,0 +1,23 @@
+name: GakuenPlugin
+version: '${project.version}'
+main: tech.inudev.gakuenplugin.GakuenPlugin
+api-version: 1.18
+authors: [ kumitatepazuru ]
+description: 学園プラグイン
+commands:
+  photograph:
+    description: 撮影中か否かを切り替えるコマンド。
+    usage: /photograph [on|off]
+    aliases: [ pg ]
+    permission: gakuenplugin.photograph
+
+permissions:
+  gakuenplugin.photograph:
+    description: 撮影中か否かを切り替えるコマンドを実行する権限
+    default: op
+  gakuenplugin.approvallogin:
+    description: 撮影中にログインできる権限。
+    default: op
+  gakuenplugin.gorakuba:
+    description: ゴラクバかどうかを見分けるためだけの権限
+    default: false
