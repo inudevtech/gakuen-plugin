@@ -9,6 +9,8 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Objects;
+
 public final class GakuenPlugin extends JavaPlugin implements Listener {
 
     @Getter private static boolean photograph;
@@ -25,6 +27,7 @@ public final class GakuenPlugin extends JavaPlugin implements Listener {
     public void onEnable() {
         // Plugin startup logic
         getServer().getPluginManager().registerEvents(this, this);
+        Objects.requireNonNull(getCommand("photograph")).setExecutor(new GakuenPlugin());
     }
 
     @Override
