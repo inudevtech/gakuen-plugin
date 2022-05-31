@@ -27,7 +27,7 @@ public final class GakuenPlugin extends JavaPlugin implements Listener {
     public void onEnable() {
         // Plugin startup logic
         getServer().getPluginManager().registerEvents(this, this);
-        Objects.requireNonNull(getCommand("photograph")).setExecutor(new GakuenPlugin());
+        Objects.requireNonNull(getCommand("photograph")).setExecutor(new GakuenCommand());
     }
 
     @Override
@@ -37,6 +37,7 @@ public final class GakuenPlugin extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
+        getLogger().info(String.valueOf(photograph));
         if (photograph) {
             event.setJoinMessage(null);
             event.getPlayer().sendTitle("§c撮影中です！", "§cご注意を。", 0, 80, 10);
@@ -56,6 +57,7 @@ public final class GakuenPlugin extends JavaPlugin implements Listener {
             event.setQuitMessage(null);
         }
         if(getServer().getOnlinePlayers().stream().noneMatch(player -> player.hasPermission("gakuenplugin.gorakuba"))){
+            getLogger().info("撮影者がいなくなったため、撮影モードを無効化しました。");
             photograph = false;
         }
     }
