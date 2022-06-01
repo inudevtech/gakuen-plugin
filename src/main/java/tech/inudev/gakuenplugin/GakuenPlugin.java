@@ -1,6 +1,10 @@
 package tech.inudev.gakuenplugin;
 
+import github.scarsz.discordsrv.DiscordSRV;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import lombok.Getter;
+import github.scarsz.discordsrv.dependencies.jda.api.EmbedBuilder;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.MessageEmbed;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -15,10 +19,13 @@ public final class GakuenPlugin extends JavaPlugin implements Listener {
 
     @Getter
     private static boolean photograph;
+    @Getter
+    private static TextChannel channel;
 
     public static void setPhotograph(boolean photograph) {
         GakuenPlugin.photograph = photograph;
         // TODO: BossBar化
+        EmbedBuilder embed = new EmbedBuilder();
         if (photograph) {
             Bukkit.getOnlinePlayers().forEach(p -> {
                 if (!p.hasPermission("gakuenplugin.gorakuba"))
@@ -27,7 +34,11 @@ public final class GakuenPlugin extends JavaPlugin implements Listener {
                     p.kickPlayer("只今撮影中です！しばらくしてから再接続して下さい！");
                 }
             });
+            embed = embed.setTitle("撮影モードが有効化されました！").setDescription("撮影中のため、建築勢はサーバーにログインできません。\nログイン可能になるまで、しばらくお待ち下さい。");
+        } else {
+            embed = embed.setTitle("撮影モードが無効化されました！").setDescription("撮影が終了しました。\nサーバーにログインできるようになりました。");
         }
+        channel.sendMessageEmbeds(embed.build()).queue();
     }
 
     @Override
@@ -35,6 +46,9 @@ public final class GakuenPlugin extends JavaPlugin implements Listener {
         // Plugin startup logic
         getServer().getPluginManager().registerEvents(this, this);
         Objects.requireNonNull(getCommand("photograph")).setExecutor(new GakuenCommand());
+
+        saveDefaultConfig();
+        channel = DiscordSRV.getPlugin().getJda().getTextChannelById(getConfig().getLong("discord.channelId"));
     }
 
     @Override
