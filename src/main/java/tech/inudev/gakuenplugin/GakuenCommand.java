@@ -21,8 +21,6 @@ public class GakuenCommand implements CommandExecutor {
                     GakuenPlugin.setPhotograph(false);
                     sender.sendMessage("撮影モードが無効になりました。");
                     return true;
-                } else { //子コマンドがその他の場合
-                    sender.sendMessage("/photograph [on|off]");
                 }
             }
         }
