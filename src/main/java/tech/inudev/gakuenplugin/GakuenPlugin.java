@@ -13,14 +13,18 @@ import java.util.Objects;
 
 public final class GakuenPlugin extends JavaPlugin implements Listener {
 
-    @Getter private static boolean photograph;
+    @Getter
+    private static boolean photograph;
+
     public static void setPhotograph(boolean photograph) {
         GakuenPlugin.photograph = photograph;
         // TODO: BossBar化
-        Bukkit.getOnlinePlayers().forEach(p -> {
-            if(!p.hasPermission("gakuenplugin.gorakuba"))
-                p.sendTitle("§c撮影中です！", "§cご注意を。", 0, 80, 10);
-        });
+        if (photograph) {
+            Bukkit.getOnlinePlayers().forEach(p -> {
+                if (!p.hasPermission("gakuenplugin.gorakuba"))
+                    p.sendTitle("§c撮影中です！", "§cご注意を。", 0, 80, 10);
+            });
+        }
     }
 
     @Override
@@ -46,7 +50,7 @@ public final class GakuenPlugin extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onPlayerLogin(PlayerLoginEvent event) {
-        if(photograph && !event.getPlayer().hasPermission("gakuenplugin.approvallogin")) {
+        if (photograph && !event.getPlayer().hasPermission("gakuenplugin.approvallogin")) {
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "只今撮影中です！しばらくしてから再接続して下さい！");
         }
     }
@@ -56,7 +60,7 @@ public final class GakuenPlugin extends JavaPlugin implements Listener {
         if (photograph) {
             event.setQuitMessage(null);
         }
-        if(getServer().getOnlinePlayers().stream().noneMatch(player -> player.hasPermission("gakuenplugin.gorakuba"))){
+        if (getServer().getOnlinePlayers().stream().noneMatch(player -> player.hasPermission("gakuenplugin.gorakuba"))) {
             getServer().broadcastMessage("撮影者がいなくなったため、撮影モードを無効化しました。");
             photograph = false;
         }
