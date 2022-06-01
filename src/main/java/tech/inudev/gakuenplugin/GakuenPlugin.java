@@ -38,7 +38,7 @@ public final class GakuenPlugin extends JavaPlugin implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         getLogger().info(String.valueOf(photograph));
-        if (photograph) {
+        if (photograph && event.getPlayer().hasPermission("gakuenplugin.gorakuba")) {
             event.setJoinMessage(null);
             event.getPlayer().sendTitle("§c撮影中です！", "§cご注意を。", 0, 80, 10);
         }
