@@ -23,6 +23,9 @@ public final class GakuenPlugin extends JavaPlugin implements Listener {
             Bukkit.getOnlinePlayers().forEach(p -> {
                 if (!p.hasPermission("gakuenplugin.gorakuba"))
                     p.sendTitle("§c撮影中です！", "§cご注意を。", 0, 80, 10);
+                else if (!p.hasPermission("gakuenplugin.approvallogin")){
+                    p.kickPlayer("只今撮影中です！しばらくしてから再接続して下さい！");
+                }
             });
         }
     }
