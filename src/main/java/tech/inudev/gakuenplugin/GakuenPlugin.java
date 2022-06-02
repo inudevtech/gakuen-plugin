@@ -28,10 +28,12 @@ public final class GakuenPlugin extends JavaPlugin implements Listener {
         EmbedBuilder embed = new EmbedBuilder();
         if (photograph) {
             Bukkit.getOnlinePlayers().forEach(p -> {
-                if (!p.hasPermission("gakuenplugin.gorakuba"))
-                    p.sendTitle("§c撮影中です！", "§cご注意を。", 0, 80, 10);
-                else if (!p.hasPermission("gakuenplugin.approvallogin")){
-                    p.kickPlayer("只今撮影中です！しばらくしてから再接続して下さい！");
+                if (!p.hasPermission("gakuenplugin.gorakuba")){
+                    if (!p.hasPermission("gakuenplugin.approvallogin")){
+                        p.kickPlayer("只今撮影中です！しばらくしてから再接続して下さい！");
+                    } else {
+                        p.sendTitle("§c撮影中です！", "§cご注意を。", 0, 80, 10);
+                    }
                 }
             });
             embed = embed.setTitle("撮影モードが有効化されました！").setDescription("撮影中のため、建築勢はサーバーにログインできません。\nログイン可能になるまで、しばらくお待ち下さい。").setColor(Color.ORANGE);
@@ -67,7 +69,7 @@ public final class GakuenPlugin extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onPlayerLogin(PlayerLoginEvent event) {
-        if (photograph && !event.getPlayer().hasPermission("gakuenplugin.approvallogin")) {
+        if (photograph && !event.getPlayer().hasPermission("gakuenplugin.approvallogin") && !event.getPlayer().hasPermission("gakuenplugin.gorakuba")) {
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "只今撮影中です！しばらくしてから再接続して下さい！");
         }
     }
