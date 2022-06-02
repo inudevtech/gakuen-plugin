@@ -81,7 +81,7 @@ public final class GakuenPlugin extends JavaPlugin implements Listener {
         }
         if (getServer().getOnlinePlayers().stream().noneMatch(player -> player.hasPermission("gakuenplugin.gorakuba"))) {
             getServer().broadcastMessage("撮影者がいなくなったため、撮影モードを無効化しました。");
-            photograph = false;
+            setPhotograph(false);
         }
     }
 }
