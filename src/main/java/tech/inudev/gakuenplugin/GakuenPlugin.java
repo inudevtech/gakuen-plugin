@@ -23,7 +23,6 @@ public final class GakuenPlugin extends JavaPlugin implements Listener {
     private static TextChannel channel;
 
     public static void setPhotograph(boolean photograph) {
-        GakuenPlugin.photograph = photograph;
         // TODO: BossBar化
         EmbedBuilder embed = new EmbedBuilder();
         if (photograph) {
@@ -37,9 +36,10 @@ public final class GakuenPlugin extends JavaPlugin implements Listener {
                 }
             });
             embed = embed.setTitle("撮影モードが有効化されました！").setDescription("撮影中のため、建築勢はサーバーにログインできません。\nログイン可能になるまで、しばらくお待ち下さい。").setColor(Color.ORANGE);
-        } else {
-            embed = embed.setTitle("撮影モードが無効化されました！").setDescription("撮影が終了しました。\nサーバーにログインできるようになりました。").setColor(Color.GREEN);
+        } else if(GakuenPlugin.photograph) {
+                embed = embed.setTitle("撮影モードが無効化されました！").setDescription("撮影が終了しました。\nサーバーにログインできるようになりました。").setColor(Color.GREEN);
         }
+        GakuenPlugin.photograph = photograph;
         channel.sendMessageEmbeds(embed.build()).queue();
     }
 
