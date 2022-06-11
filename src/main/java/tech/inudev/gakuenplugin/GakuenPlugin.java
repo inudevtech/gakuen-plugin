@@ -1,6 +1,8 @@
 package tech.inudev.gakuenplugin;
 
 import github.scarsz.discordsrv.DiscordSRV;
+import github.scarsz.discordsrv.api.Subscribe;
+import github.scarsz.discordsrv.api.events.DiscordReadyEvent;
 import github.scarsz.discordsrv.dependencies.jda.api.EmbedBuilder;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import lombok.Getter;
@@ -50,6 +52,11 @@ public final class GakuenPlugin extends JavaPlugin implements Listener {
         Objects.requireNonNull(getCommand("photograph")).setExecutor(new GakuenCommand());
 
         saveDefaultConfig();
+        DiscordSRV.api.subscribe(this);
+    }
+
+    @Subscribe
+    public void discordReadyEvent(DiscordReadyEvent event){
         channel = DiscordSRV.getPlugin().getJda().getTextChannelById(getConfig().getLong("discord.channelId"));
     }
 
