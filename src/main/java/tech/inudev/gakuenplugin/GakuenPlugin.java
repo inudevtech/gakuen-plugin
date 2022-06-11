@@ -29,8 +29,8 @@ public final class GakuenPlugin extends JavaPlugin implements Listener {
         EmbedBuilder embed = new EmbedBuilder();
         if (photograph) {
             Bukkit.getOnlinePlayers().forEach(p -> {
-                if (!p.hasPermission("gakuenplugin.gorakuba")){
-                    if (!p.hasPermission("gakuenplugin.approvallogin")){
+                if (!p.hasPermission("gakuenplugin.gorakuba")) {
+                    if (!p.hasPermission("gakuenplugin.approvallogin")) {
                         p.kickPlayer("只今撮影中です！しばらくしてから再接続して下さい！");
                     } else {
                         p.sendTitle("§c撮影中です！", "§cご注意を。", 0, 80, 10);
@@ -38,11 +38,13 @@ public final class GakuenPlugin extends JavaPlugin implements Listener {
                 }
             });
             embed = embed.setTitle("撮影モードが有効化されました！").setDescription("撮影中のため、建築勢はサーバーにログインできません。\nログイン可能になるまで、しばらくお待ち下さい。").setColor(Color.ORANGE);
-        } else if(GakuenPlugin.photograph) {
-                embed = embed.setTitle("撮影モードが無効化されました！").setDescription("撮影が終了しました。\nサーバーにログインできるようになりました。").setColor(Color.GREEN);
+        } else if (GakuenPlugin.photograph) {
+            embed = embed.setTitle("撮影モードが無効化されました！").setDescription("撮影が終了しました。\nサーバーにログインできるようになりました。").setColor(Color.GREEN);
         }
-        GakuenPlugin.photograph = photograph;
-        channel.sendMessageEmbeds(embed.build()).queue();
+        if (!embed.isEmpty()) {
+            GakuenPlugin.photograph = photograph;
+            channel.sendMessageEmbeds(embed.build()).queue();
+        }
     }
 
     @Override
@@ -56,7 +58,7 @@ public final class GakuenPlugin extends JavaPlugin implements Listener {
     }
 
     @Subscribe
-    public void discordReadyEvent(DiscordReadyEvent event){
+    public void discordReadyEvent(DiscordReadyEvent event) {
         channel = DiscordSRV.getPlugin().getJda().getTextChannelById(getConfig().getLong("discord.channelId"));
     }
 
