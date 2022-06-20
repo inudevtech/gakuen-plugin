@@ -16,6 +16,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.awt.*;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public final class GakuenPlugin extends JavaPlugin implements Listener {
 
@@ -88,10 +89,12 @@ public final class GakuenPlugin extends JavaPlugin implements Listener {
         if (photograph) {
             event.setQuitMessage(null);
 
-            if (getServer().getOnlinePlayers().stream().noneMatch(player -> player.hasPermission("gakuenplugin.gorakuba"))) {
-                getServer().broadcastMessage("撮影者がいなくなったため、撮影モードを無効化しました。");
-                setPhotograph(false);
-            }
+            getServer().getScheduler().runTaskLater(this,() -> {
+                if (getServer().getOnlinePlayers().stream().noneMatch(player -> player.hasPermission("gakuenplugin.gorakuba"))) {
+                    getServer().broadcastMessage("撮影者がいなくなったため、撮影モードを無効化しました。");
+                    setPhotograph(false);
+                }
+            },1);
         }
     }
 }
