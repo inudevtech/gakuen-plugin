@@ -1,11 +1,35 @@
 package tech.inudev.gakuenplugin;
 
+import org.apache.commons.codec.digest.DigestUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+
 public class GakuenCommand implements CommandExecutor {
+    static public void setResourcePack(String url, CommandSender sender){
+        try {
+            InputStream inputStream = new URL(url).openStream();
+            Bukkit.getOnlinePlayers().forEach((p) -> {
+                try {
+                    p.setResourcePack(url,DigestUtils.sha1(inputStream));
+                } catch (IOException e) {
+                    sender.sendMessage("リソースパックの取得に失敗しました。\n詳細はログを確認してください。");
+                    e.printStackTrace();
+                }
+            });
+        } catch (IOException e) {
+            sender.sendMessage("リソースパックの取得に失敗しました。\n詳細はログを確認してください。");
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         if (command.getName().equalsIgnoreCase("photograph")) { //親コマンドの判定
@@ -22,6 +46,18 @@ public class GakuenCommand implements CommandExecutor {
                     sender.sendMessage("撮影モードが無効になりました。");
                     return true;
                 }
+            }
+        } else if(command.getName().equalsIgnoreCase("r-reload")) {
+            if(args.length == 0){
+                sender.sendMessage("リソースパックを更新中...");
+                setResourcePack(GakuenPlugin.getInstance().getConfig().getString("resourcepack-url"), sender);
+                sender.sendMessage("リソースパックを更新しました。");
+                return true;
+            } else if(args.length == 1){
+                sender.sendMessage("リソースパックを更新中...");
+                setResourcePack(args[0], sender);
+                sender.sendMessage("リソースパックを更新しました。");
+                return true;
             }
         }
         return false;

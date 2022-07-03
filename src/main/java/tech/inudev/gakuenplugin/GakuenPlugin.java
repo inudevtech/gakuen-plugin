@@ -16,7 +16,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.awt.*;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public final class GakuenPlugin extends JavaPlugin implements Listener {
 
@@ -24,6 +23,9 @@ public final class GakuenPlugin extends JavaPlugin implements Listener {
     private static boolean photograph;
     @Getter
     private static TextChannel channel;
+
+    @Getter
+    private static GakuenPlugin instance;
 
     public static void setPhotograph(boolean photograph) {
         // TODO: BossBar化
@@ -53,9 +55,11 @@ public final class GakuenPlugin extends JavaPlugin implements Listener {
         // Plugin startup logic
         getServer().getPluginManager().registerEvents(this, this);
         Objects.requireNonNull(getCommand("photograph")).setExecutor(new GakuenCommand());
+        Objects.requireNonNull(getCommand("r-reload")).setExecutor(new GakuenCommand());
 
         saveDefaultConfig();
         DiscordSRV.api.subscribe(this);
+        instance = this;
     }
 
     @Subscribe
@@ -70,6 +74,7 @@ public final class GakuenPlugin extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
+        GakuenCommand.setResourcePack(GakuenPlugin.getInstance().getConfig().getString("resourcepack-url"), event.getPlayer());
         getLogger().info(String.valueOf(photograph));
         if (photograph && !event.getPlayer().hasPermission("gakuenplugin.gorakuba")) {
             event.setJoinMessage(null);

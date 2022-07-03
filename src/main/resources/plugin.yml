@@ -7,9 +7,13 @@ description: 学園プラグイン
 commands:
   photograph:
     description: 撮影中か否かを切り替えるコマンド。
-    usage: /photograph [on|off]
+    usage: /photograph <on|off>
     aliases: [ pg ]
     permission: gakuenplugin.photograph
+  r-reload:
+    description: リソースパックをリロードするコマンド。
+    usage: /r-reload [URL]
+    permission: gakuenplugin.r-reload
 
 permissions:
   gakuenplugin.photograph:
@@ -21,6 +25,9 @@ permissions:
   gakuenplugin.gorakuba:
     description: ゴラクバかどうかを見分けるためだけの権限
     default: false
+  gakuenplugin.r-reload:
+    description: リソースパックをリロードするコマンドを実行する権限
+    default: op
 
 depend:
   - DiscordSRV
