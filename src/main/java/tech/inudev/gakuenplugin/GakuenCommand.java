@@ -1,24 +1,32 @@
 package tech.inudev.gakuenplugin;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 
 public class GakuenCommand implements CommandExecutor {
     static public void setResourcePack(String url, CommandSender sender){
         try {
-            InputStream inputStream = new URL(url).openStream();
+            URL fetchWebsite = new URL(url);
+            File file = new File(GakuenPlugin.getInstance().getDataFolder().getAbsolutePath()+Paths.get(FilenameUtils.getName(fetchWebsite.getPath())));
+
+            FileUtils.copyURLToFile(fetchWebsite, file);
             Bukkit.getOnlinePlayers().forEach((p) -> {
                 try {
-                    p.setResourcePack(url,DigestUtils.sha1(inputStream));
+                    p.setResourcePack(url,DigestUtils.sha1(new FileInputStream(file)));
                 } catch (IOException e) {
                     sender.sendMessage("リソースパックの取得に失敗しました。\n詳細はログを確認してください。");
                     e.printStackTrace();
