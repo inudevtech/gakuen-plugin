@@ -3,9 +3,13 @@ package tech.inudev.gakuenplugin;
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.api.Subscribe;
 import github.scarsz.discordsrv.api.events.DiscordReadyEvent;
+import github.scarsz.discordsrv.dependencies.commons.io.FileUtils;
+import github.scarsz.discordsrv.dependencies.commons.io.FilenameUtils;
 import github.scarsz.discordsrv.dependencies.jda.api.EmbedBuilder;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import lombok.Getter;
+
+import org.apache.commons.codec.digest.DigestUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -15,6 +19,11 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.awt.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Paths;
 import java.util.Objects;
 
 public final class GakuenPlugin extends JavaPlugin implements Listener {
@@ -73,8 +82,12 @@ public final class GakuenPlugin extends JavaPlugin implements Listener {
     }
 
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        GakuenCommand.setResourcePack(GakuenPlugin.getInstance().getConfig().getString("resourcepack-url"), event.getPlayer());
+    public void onPlayerJoin(PlayerJoinEvent event) throws IOException {
+        URL fetchWebsite = new URL(getConfig().getString("resourcepack-url"));
+        File file = new File(getDataFolder().getAbsolutePath()+Paths.get(FilenameUtils.getName(fetchWebsite.getPath())));
+        FileUtils.copyURLToFile(fetchWebsite, file);
+        event.getPlayer().setResourcePack(getConfig().getString("resourcepack-url"),DigestUtils.sha1(new FileInputStream(file)));
+
         getLogger().info(String.valueOf(photograph));
         if (photograph && !event.getPlayer().hasPermission("gakuenplugin.gorakuba")) {
             event.setJoinMessage(null);
