@@ -3,13 +3,13 @@ package tech.inudev.gakuenplugin;
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.api.Subscribe;
 import github.scarsz.discordsrv.api.events.DiscordReadyEvent;
-import github.scarsz.discordsrv.dependencies.commons.io.FileUtils;
-import github.scarsz.discordsrv.dependencies.commons.io.FilenameUtils;
 import github.scarsz.discordsrv.dependencies.jda.api.EmbedBuilder;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import lombok.Getter;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,9 +20,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.awt.*;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Objects;
 
@@ -82,17 +82,24 @@ public final class GakuenPlugin extends JavaPlugin implements Listener {
     }
 
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) throws IOException {
-        URL fetchWebsite = new URL(getConfig().getString("resourcepack-url"));
-        File file = new File(getDataFolder().getAbsolutePath()+Paths.get(FilenameUtils.getName(fetchWebsite.getPath())));
-        FileUtils.copyURLToFile(fetchWebsite, file);
-        event.getPlayer().setResourcePack(getConfig().getString("resourcepack-url"),DigestUtils.sha1(new FileInputStream(file)));
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        Bukkit.getScheduler().runTaskAsynchronously(GakuenPlugin.getInstance(), () -> {
+            try {
+                URL fetchWebsite = new URL(Objects.requireNonNull(getConfig().getString("resourcepack-url")));
+                File file = new File(getDataFolder().getAbsolutePath() + Paths.get(FilenameUtils.getName(fetchWebsite.getPath())));
+                FileUtils.copyURLToFile(fetchWebsite, file);
+                event.getPlayer().setResourcePack(Objects.requireNonNull(getConfig().getString("resourcepack-url")), DigestUtils.sha1(Files.newInputStream(file.toPath())));
 
-        getLogger().info(String.valueOf(photograph));
-        if (photograph && !event.getPlayer().hasPermission("gakuenplugin.gorakuba")) {
-            event.setJoinMessage(null);
-            event.getPlayer().sendTitle("§c撮影中です！", "§cご注意を。", 0, 80, 10);
-        }
+                getLogger().info(String.valueOf(photograph));
+                if (photograph && !event.getPlayer().hasPermission("gakuenplugin.gorakuba")) {
+                    event.setJoinMessage(null);
+                    event.getPlayer().sendTitle("§c撮影中です！", "§cご注意を。", 0, 80, 10);
+                }
+            } catch (IOException e) {
+                event.getPlayer().sendMessage("リソースパックの取得に失敗しました。\n詳細はログを確認してください。");
+                e.printStackTrace();
+            }
+        });
     }
 
     @EventHandler

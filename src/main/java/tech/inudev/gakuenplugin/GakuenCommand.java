@@ -13,27 +13,32 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class GakuenCommand implements CommandExecutor {
-    static public void setResourcePack(String url, CommandSender sender){
-        try {
-            URL fetchWebsite = new URL(url);
-            File file = new File(GakuenPlugin.getInstance().getDataFolder().getAbsolutePath()+Paths.get(FilenameUtils.getName(fetchWebsite.getPath())));
+    static public void setResourcePack(String url, CommandSender sender) {
+        Bukkit.getScheduler().runTaskAsynchronously(GakuenPlugin.getInstance(), () -> {
+            try {
+                sender.sendMessage("リソースパックを更新中...");
+                URL fetchWebsite = new URL(url);
+                File file = new File(GakuenPlugin.getInstance().getDataFolder().getAbsolutePath() + Paths.get(FilenameUtils.getName(fetchWebsite.getPath())));
 
-            FileUtils.copyURLToFile(fetchWebsite, file);
-            Bukkit.getOnlinePlayers().forEach((p) -> {
-                try {
-                    p.setResourcePack(url,DigestUtils.sha1(new FileInputStream(file)));
-                } catch (IOException e) {
-                    sender.sendMessage("リソースパックの取得に失敗しました。\n詳細はログを確認してください。");
-                    e.printStackTrace();
-                }
-            });
-        } catch (IOException e) {
-            sender.sendMessage("リソースパックの取得に失敗しました。\n詳細はログを確認してください。");
-            e.printStackTrace();
-        }
+                FileUtils.copyURLToFile(fetchWebsite, file);
+                Bukkit.getOnlinePlayers().forEach((p) -> {
+                    try {
+                        p.setResourcePack(url, DigestUtils.sha1(Files.newInputStream(file.toPath())));
+                    } catch (IOException e) {
+                        sender.sendMessage("リソースパックの取得に失敗しました。\n詳細はログを確認してください。");
+                        e.printStackTrace();
+                    }
+                });
+                sender.sendMessage("リソースパックを更新しました。");
+            } catch (IOException e) {
+                sender.sendMessage("リソースパックの取得に失敗しました。\n詳細はログを確認してください。");
+                e.printStackTrace();
+            }
+        });
     }
 
     @Override
@@ -53,16 +58,12 @@ public class GakuenCommand implements CommandExecutor {
                     return true;
                 }
             }
-        } else if(command.getName().equalsIgnoreCase("r-reload")) {
-            if(args.length == 0){
-                sender.sendMessage("リソースパックを更新中...");
+        } else if (command.getName().equalsIgnoreCase("r-reload")) {
+            if (args.length == 0) {
                 setResourcePack(GakuenPlugin.getInstance().getConfig().getString("resourcepack-url"), sender);
-                sender.sendMessage("リソースパックを更新しました。");
                 return true;
-            } else if(args.length == 1){
-                sender.sendMessage("リソースパックを更新中...");
+            } else if (args.length == 1) {
                 setResourcePack(args[0], sender);
-                sender.sendMessage("リソースパックを更新しました。");
                 return true;
             }
         }
