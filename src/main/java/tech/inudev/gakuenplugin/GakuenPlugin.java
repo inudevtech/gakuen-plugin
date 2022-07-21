@@ -83,18 +83,17 @@ public final class GakuenPlugin extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
+        if (photograph && !event.getPlayer().hasPermission("gakuenplugin.gorakuba")) {
+            event.setJoinMessage(null);
+            event.getPlayer().sendTitle("§c撮影中です！", "§cご注意を。", 0, 80, 10);
+        }
+        
         Bukkit.getScheduler().runTaskAsynchronously(GakuenPlugin.getInstance(), () -> {
             try {
                 URL fetchWebsite = new URL(Objects.requireNonNull(getConfig().getString("resourcepack-url")));
                 File file = new File(getDataFolder().getAbsolutePath() + Paths.get(FilenameUtils.getName(fetchWebsite.getPath())));
                 FileUtils.copyURLToFile(fetchWebsite, file);
                 event.getPlayer().setResourcePack(Objects.requireNonNull(getConfig().getString("resourcepack-url")), DigestUtils.sha1(Files.newInputStream(file.toPath())));
-
-                getLogger().info(String.valueOf(photograph));
-                if (photograph && !event.getPlayer().hasPermission("gakuenplugin.gorakuba")) {
-                    event.setJoinMessage(null);
-                    event.getPlayer().sendTitle("§c撮影中です！", "§cご注意を。", 0, 80, 10);
-                }
             } catch (IOException e) {
                 event.getPlayer().sendMessage("リソースパックの取得に失敗しました。\n詳細はログを確認してください。");
                 e.printStackTrace();
